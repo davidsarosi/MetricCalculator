@@ -1,4 +1,4 @@
-# Install script for directory: /home/tobi/CLionProjects/MetricCalculator/src
+# Install script for directory: /home/sarosi/CLionProjects/MetricCalculator/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

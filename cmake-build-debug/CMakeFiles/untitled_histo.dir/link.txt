@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/untitled_histo.dir/main.cpp.o CMakeFiles/untitled_histo.dir/MetricCalculator.cpp.o CMakeFiles/untitled_histo.dir/test.cpp.o CMakeFiles/untitled_histo.dir/test-main.cpp.o  -o untitled_histo 

@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/tobi/CLionProjects/MetricCalculator/src/MetricCalculator.cpp" "/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/MetricCalculator.dir/MetricCalculator.cpp.o"
-  "/home/tobi/CLionProjects/MetricCalculator/src/main.cpp" "/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/MetricCalculator.dir/main.cpp.o"
+  "/home/sarosi/CLionProjects/MetricCalculator/src/MetricCalculator.cpp" "/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/MetricCalculator.dir/MetricCalculator.cpp.o"
+  "/home/sarosi/CLionProjects/MetricCalculator/src/main.cpp" "/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/MetricCalculator.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

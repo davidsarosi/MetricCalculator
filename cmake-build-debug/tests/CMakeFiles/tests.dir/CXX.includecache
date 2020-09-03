@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/tobi/CLionProjects/MetricCalculator/include/catch.hpp
+/home/sarosi/CLionProjects/MetricCalculator/include/catch.hpp
 TargetConditionals.h
 -
 ciso646
@@ -382,7 +382,7 @@ string
 memory
 -
 Foundation/Foundation.h
-/home/tobi/CLionProjects/MetricCalculator/include/Foundation/Foundation.h
+/home/sarosi/CLionProjects/MetricCalculator/include/Foundation/Foundation.h
 limits
 -
 set
@@ -586,7 +586,23 @@ algorithm
 cassert
 -
 
-/home/tobi/CLionProjects/MetricCalculator/src/MetricCalculator.h
+/home/sarosi/CLionProjects/MetricCalculator/src/MetricCalculator.cpp
+MetricCalculator.h
+/home/sarosi/CLionProjects/MetricCalculator/src/MetricCalculator.h
+boost/algorithm/string.hpp
+-
+cmath
+-
+boost/accumulators/accumulators.hpp
+-
+boost/accumulators/statistics/stats.hpp
+-
+boost/accumulators/statistics/mean.hpp
+-
+boost/accumulators/statistics/variance.hpp
+-
+
+/home/sarosi/CLionProjects/MetricCalculator/src/MetricCalculator.h
 iostream
 -
 vector
@@ -596,13 +612,17 @@ map
 string
 -
 
-/home/tobi/CLionProjects/MetricCalculator/tests/test.cpp
+/home/sarosi/CLionProjects/MetricCalculator/tests/test-main.cpp
+../include/catch.hpp
+/home/sarosi/CLionProjects/MetricCalculator/include/catch.hpp
+
+/home/sarosi/CLionProjects/MetricCalculator/tests/test.cpp
 iostream
 -
 ../include/catch.hpp
-/home/tobi/CLionProjects/MetricCalculator/include/catch.hpp
+/home/sarosi/CLionProjects/MetricCalculator/include/catch.hpp
 ../src/MetricCalculator.h
-/home/tobi/CLionProjects/MetricCalculator/src/MetricCalculator.h
+/home/sarosi/CLionProjects/MetricCalculator/src/MetricCalculator.h
 boost/algorithm/string.hpp
 -
 cmath

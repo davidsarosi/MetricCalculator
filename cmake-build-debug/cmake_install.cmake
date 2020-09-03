@@ -1,4 +1,4 @@
-# Install script for directory: /home/tobi/CLionProjects/MetricCalculator
+# Install script for directory: /home/sarosi/CLionProjects/MetricCalculator
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,8 +39,8 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/src/cmake_install.cmake")
-  include("/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/tests/cmake_install.cmake")
+  include("/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/src/cmake_install.cmake")
+  include("/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/tests/cmake_install.cmake")
 
 endif()
 
@@ -52,5 +52,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -1,8 +1,8 @@
-/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/rebuild_cache.dir
-/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/edit_cache.dir
-/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/MetricCalculator.dir
-/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/tests/CMakeFiles/edit_cache.dir
-/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/tests/CMakeFiles/rebuild_cache.dir
-/home/tobi/CLionProjects/MetricCalculator/cmake-build-debug/tests/CMakeFiles/tests.dir
+/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/rebuild_cache.dir
+/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/edit_cache.dir
+/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/src/CMakeFiles/MetricCalculator.dir
+/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/tests/CMakeFiles/edit_cache.dir
+/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/tests/CMakeFiles/rebuild_cache.dir
+/home/sarosi/CLionProjects/MetricCalculator/cmake-build-debug/tests/CMakeFiles/tests.dir
