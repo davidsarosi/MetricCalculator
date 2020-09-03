@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/MetricCalculator.dir/main.cpp.o CMakeFiles/MetricCalculator.dir/MetricCalculator.cpp.o  -o MetricCalculator 
