@@ -2,10 +2,9 @@
 #include "MetricCalculator.h"
 #include <iostream>
 #include <fstream>
+#include "../include/catch.hpp"
 
 int main() {
-
-
 
 
     //MetricCalculator metricCalculator("1520;578 1520;582 1518;594 1512;610 1508;628 1498;650 1488;678 1476;702 1460;746 1444;786 1430;840 1428;848 1418;896 1406;950 1394;998 1390;1026 1380;1062 1374;1106 1370;1120 1368;1136 1366;1150 1366;1160 1366;1174");
