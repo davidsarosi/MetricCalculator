@@ -9,23 +9,24 @@
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
+#include <boost/accumulators/statistics/weighted_variance.hpp>
 
-std::vector<float> MetricCalculator::calculate(const std::string& input) {
+std::vector<float> MetricCalculator::calculate(const std::string &input) {
     stringToCoordinates(input);
+    setVectors();
+    setWeight();
     setDistances();
-    setLocalVectors();
     setDistancePerPath();
     setHistorgram();
-    setWeight();
     setAvarageDistanceFromWeight();
-    setVarianceFromWeight();
+    setDeviationFromWeight();
     setInflectionPointCount();
     setHistoData();
     setMetrics();
     return _metrics;
 }
 
-void MetricCalculator::stringToCoordinates(const std::string& input) {
+void MetricCalculator::stringToCoordinates(const std::string &input) {
 
     std::vector<std::string> raw_points;
     boost::split(raw_points, input, boost::is_any_of(" "));
@@ -33,7 +34,7 @@ void MetricCalculator::stringToCoordinates(const std::string& input) {
 
     std::vector<std::string> temp;
     _points.reserve(raw_points.size());
-    for(auto & raw_point : raw_points){
+    for (auto &raw_point : raw_points) {
         boost::split(temp, raw_point, boost::is_any_of(";"));
         auto p = new Point;
         p->x = std::stod(temp[0]);
@@ -42,147 +43,197 @@ void MetricCalculator::stringToCoordinates(const std::string& input) {
     }
 }
 
-void MetricCalculator::setLocalVectors() {
-    _localVectors.reserve(_points.size() - 1);
+void MetricCalculator::setVectors() {
+    _vectors.reserve(_points.size() - 1);
     for (int i = 0; i < _points.size() - 1; i++) {
         auto v = new Vector;
         v->start = _points[i];
-        v->end = _points[i+1];
-        v->length = distance(v->start,v->end);
+        v->end = _points[i + 1];
+        v->length = distance(v->start, v->end);
+        v->relativePosition = v->end - v->start;
         v->angle = atan2(*v);
-        _localVectors.emplace_back(*v);
+        _vectors.emplace_back(*v);
     }
 }
 
 void MetricCalculator::setHistorgram() {
     _histogram = std::vector<float>(360);
-    std::fill(_histogram.begin(),_histogram.end(),0.0);
-    for(auto &v : _localVectors){
+
+    std::fill(_histogram.begin(), _histogram.end(), 0.0);
+    for (auto &v : _vectors) {
         int index = v.angle;
         _histogram[index] += v.length;
     }
     //normalise
-    float max = _histogram[0];
-    for(auto & i : _histogram){
-        i>max? max = i : 0;
-    }
+    auto max = std::max_element(_histogram.begin(), _histogram.end());
+
     for (int i = 0; i < 360; ++i) {
-        _histogram[i] /= max;
+        _histogram[i] /= *max;
     }
 }
 
 void MetricCalculator::setInflectionPointCount() {
-    if (_localVectors.size() < 2) {
+    if (_vectors.size() < 2) {
         _inflcetionPointCount = 0;
         return;
     }
-    auto current = _localVectors[0];
-    auto next = _localVectors[1];
-    bool currentStatus = current
-            _localVector[0].first * _localVector[1].second - _localVector[0].second * _localVector[1].first > 0;
-
+    auto current = _vectors[0].relativePosition;
+    auto next = _vectors[1].relativePosition;
+    bool currentGradient = current.x * next.y - current.y * next.x > 0;    //init current gradient
     int counter = 0;
-    for (int i = 0; i < _localVector.size() - 1; i++) {
-        if (currentStatus != _localVector[i].first * _localVector[i + 1].second -
-                             _localVector[i].second * _localVector[i + 1].first > 0) {
-            counter++;
-            currentStatus = !currentStatus;
+    std::vector<double> gradientLenghts;
+    gradientLenghts.reserve(_vectors.size() - 1);    //TODO maybe give it more love
+    double currentGradientLenght = 0;
+    double maxGradientLenght = 0;
+    for (int i = 0; i < _vectors.size() - 1; i++) {
+        current = _vectors[i].relativePosition;
+        next = _vectors[i + 1].relativePosition;
+        currentGradientLenght += _vectors[i].length;
+        if (currentGradient != current.x * next.y - current.y * next.x > 0) {  //if current and last gradient differs
+            counter++;                                                 // then we reached and inflection point
+            currentGradient = !currentGradient;
+            gradientLenghts.emplace_back(currentGradientLenght);
+            maxGradientLenght = currentGradientLenght > maxGradientLenght ? currentGradientLenght : maxGradientLenght;
+            currentGradientLenght = 0;
         }
     }
+    gradientLenghts.shrink_to_fit();
+    double sum_of_elems = 0;
+    for (auto &n : gradientLenghts)
+        sum_of_elems += n;
+    using namespace boost::accumulators;
+    accumulator_set<double, stats<tag::mean, tag::variance>> acc;
+
+
+    for (auto gl:gradientLenghts) {
+        acc(gl);
+    }
+    _maxCurvaturePerPath = maxGradientLenght / _pathLenght;
+    _curvatureLenghtDeviation = std::sqrt(variance(acc))/maxGradientLenght;
+    _avarageCurvatureLenght=mean(acc)/maxGradientLenght;
     _inflcetionPointCount = counter;
 }
 
-MetricCalculator::MetricCalculator() {
-
-}
 
 void MetricCalculator::setWeight() {
-    double x = 0;
-    double y = 0;
-    for(auto p : _points){
-        x+=p.x;
-        y+=p.y;
+    Point weight{0, 0};
+    for (auto p : _points) {
+        weight = weight + p;
     }
-    _center.x = x/_points.size();
-    _center.y = y/_points.size();
+    _center = weight / _points.size();
 }
 
 void MetricCalculator::setAvarageDistanceFromWeight() {
     double sumDistance = 0;
-    for(auto d : _distancesFromWeigth){
+    double max = 0;
+    for (auto d : _distancesFromWeigth) {
         sumDistance += d;
+        max = d > max ? d : max;
     }
-    _avarageDistanceFromWeight = sumDistance/_distancesFromWeigth.size();
+    _maxDistanceFromWeight = max;
+    _avarageDistanceFromWeight = sumDistance / _distancesFromWeigth.size() / max;
 }
 
 void MetricCalculator::setDistances() {
-    for(auto p : _points){
-        _distancesFromWeigth.push_back(distance(p,_center));
+    _distancesFromWeigth.reserve(_points.size());
+    for (auto p : _points) {
+        _distancesFromWeigth.emplace_back(distance(p, _center));
     }
 }
+
 //elmozdulás/út hányados számítása
 void MetricCalculator::setDistancePerPath() {
     double pathLength = 0;
-    for(auto v : _localVectors){
+    for (auto v : _vectors) {      //lenght of trajectory
         pathLength += v.length;
     }
-    double dist = distance(_points.front(),_points.back());
+    _pathLenght = pathLength;
+    double dist = distance(_points.front(), _points.back());
     _distancePerPath = dist / pathLength;
 }
 
-void MetricCalculator::setVarianceFromWeight() {
+void MetricCalculator::setDeviationFromWeight() {
     double sumBias = 0;
-    for(auto d : _distancesFromWeigth){
-        double bias = std::abs(_avarageDistanceFromWeight - d);
-        sumBias += bias*bias;
+    double bias = 0;
+    for (auto d : _distancesFromWeigth) {
+        bias = std::abs(_avarageDistanceFromWeight - d);
+        sumBias += bias * bias;
     }
-    _varianceFromWeight = std::sqrt(sumBias / _distancesFromWeigth.size());
+    _deviationFromWeight = std::sqrt(sumBias / _distancesFromWeigth.size()) / _maxDistanceFromWeight;
 }
 
-double  MetricCalculator::distance(Point &p1, Point &p2) {
+double MetricCalculator::distance(Point &p1, Point &p2) {
     return std::sqrt(((p2.x - p1.x) * (p2.x - p1.x)) + ((p2.y - p1.y) * (p2.y - p1.y)));
 }
+
+double MetricCalculator::distance(Point &&p1, Point &p2) {
+    return std::sqrt(((p2.x - p1.x) * (p2.x - p1.x)) + ((p2.y - p1.y) * (p2.y - p1.y)));
+}
+
 void MetricCalculator::setHistoData() {
-
-
-        for(int i=0; i<360; i++){
-        _histo[i]=1;
-    }
     using namespace boost::accumulators;
-    accumulator_set<float, stats<tag::mean, tag::variance>> acc;
+    accumulator_set<float, stats<tag::weighted_variance(lazy)>, float> acc;
+//    std::fill(_histogram.begin(), _histogram.end(), 0.0);
 
-    for(auto m: _histo) {
-        for (int i = 0; i < m.second*1000; i++)
-            acc(m.first);
+
+    Point fancyWeightPoint{0, 0};
+    Point tempDummy{0, 0};
+    double angle_in_radian;
+    double x, y;
+    for (int i = 0; i < _histogram.size(); i++) {
+        angle_in_radian = i * M_PI / 180.0;
+        tempDummy.x = std::cos(angle_in_radian);
+        tempDummy.y = std::sin(angle_in_radian);
+
+        fancyWeightPoint = fancyWeightPoint + tempDummy * _histogram[i];
+    }
+    fancyWeightPoint = fancyWeightPoint / 360;
+
+    double dis = distance({0, 0}, fancyWeightPoint);
+    _histoFancyVariance = dis;
+
+
+    double coverage = 0;
+    for (auto m :_histogram) {
+        coverage += m > 0 ? 1 : 0;
     }
 
-    std::cout << "mean=" << mean(acc) << ", deviation=" << std::sqrt(variance(acc)) << '\n';
-    // prints "mean=3.5, deviation=2.91667"
-
-
-
-
-    int count=0;
-    for (auto m :_histo) {
-        count+=m.second>0?1:0;
-    }
-    _histoCoverage=count/360.0;
+    _histoCoverage = static_cast<float>(coverage / 360.0);
 }
 
 void MetricCalculator::setMetrics() {
+    //TODO reserve
     _metrics.push_back(_distancePerPath);
     _metrics.push_back(_avarageDistanceFromWeight);
-    _metrics.push_back(_varianceFromWeight);
-    _metrics.push_back(_histoVariance);
+    _metrics.push_back(_deviationFromWeight);
+    _metrics.push_back(_histoFancyVariance);
     _metrics.push_back(_histoCoverage);
-    _metrics.push_back(_inflcetionPointCount);
+//    _metrics.push_back(_inflcetionPointCount);
+    _metrics.push_back(_maxCurvaturePerPath);
 }
 
 int MetricCalculator::atan2(Vector &v) {
-    int x = v.end.x - v.start.x;
-    int y = v.end.y - v.start.y;
-    int angle = floor((std::atan2(y, x) * 180 / M_PI));
+    int angle = floor((std::atan2(v.relativePosition.y, v.relativePosition.x) * 180 / M_PI));
     return angle > 0 ? angle : 360 + angle;
 }
+
+std::ostream &operator<<(std::ostream &out, MetricCalculator &m) {
+
+    out << "Distance per path: " << m._distancePerPath << std::endl;
+    out << "Avarage distance from weight: " << m._avarageDistanceFromWeight << std::endl;
+    out << "Deviation from weight: " << m._deviationFromWeight << std::endl;
+    out << "Histogram fancy variance: " << m._histoFancyVariance << std::endl;
+    out << "Histogram coverage: " << m._histoCoverage << std::endl;
+    out << "Inflection point count: " << m._inflcetionPointCount << std::endl;      //TODO not a real metric
+    out << "Longest curve/full path: " << m._maxCurvaturePerPath << std::endl;
+    out << "Mean curvature lenght/max curvature lenght: " << m._avarageCurvatureLenght << std::endl;
+    out << "Curvature deviation/ max curvature lenght: " << m._curvatureLenghtDeviation << std::endl;
+
+    return out;
+}
+
+
+
+
 
 
